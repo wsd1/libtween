@@ -61,11 +61,18 @@
 extern "C" {
 #endif
 
+
+//结构大致说明
+// Tween_Engine 挂了一串 Tween_Node，每一个node都有个tween
+// Tween 结构也有一个 Tween_Node 成员，可以成链
+
+//Tween 结构的链表节点
 typedef struct Tween_Node {
     struct Tween* tween;
     struct Tween_Node* next;
 } Tween_Node;
 
+//Tween 链表的表头
 typedef struct Tween_Engine {
     Tween_Node* tweens;
 } Tween_Engine;
@@ -84,14 +91,16 @@ typedef struct Tween_Props {
 
 typedef void (*Tween_Callback)(struct Tween*);
 
+
+//Tween 是最主要的结构 
 typedef struct Tween {
     Tween_Engine* engine;
     Tween_Props props;
     Tween_Props toProps;
     uint32_t duration;
     uint32_t delay;
-    int repeat;
-    int yoyo;
+    int repeat; //重复
+    int yoyo;   //来回  代码中将其作为bool使用
     Tween_Easing easing;
     Tween_Callback startCallback;
     Tween_Callback updateCallback;
@@ -101,7 +110,7 @@ typedef struct Tween {
     int startCallbackFired;
     Tween_Props startProps;
     Tween_Props repeatProps;
-    int reversed;
+    int reversed;   //在yoyo模式下，反方向运动，就会标志的
     Tween_Node* chain;
 } Tween;
 
@@ -183,7 +192,7 @@ TWEEN_FORCE_INLINE void Tween_SwapProps(Tween_Props* props, Tween_Props* props2)
 }
 
 /**
- * Tween_UpdateProps()
+ * Tween_UpdateProps() value是0~1之间的值
  */
 
 TWEEN_FORCE_INLINE void Tween_UpdateProps(Tween_Props* startProps, Tween_Props* toProps, Tween_Props* props, double value) {
